@@ -1,7 +1,7 @@
 import json
 import os
 
-COURSE_INDEX_PATH = "data/metadata/course_index.json"
+COURSE_INDEX_PATH = "data/course_index.json"
 
 def load_course_list():
     with open(COURSE_INDEX_PATH, encoding="utf-8") as f:
