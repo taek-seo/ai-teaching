@@ -2,8 +2,11 @@ import streamlit as st
 import os
 from components.rag_pipeline import embed_pdf_and_save
 
+# 데이터 디렉터리 절대 경로
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 def get_course_path(course_id):
-    return os.path.join("data", "courses", course_id)
+    return os.path.join(BASE_DIR, "data", "courses", course_id)
 
 def show_instructor_upload():
     st.title("📥 교안 업로드 및 학습")

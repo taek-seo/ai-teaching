@@ -6,6 +6,9 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import PyMuPDFLoader
 from components.quiz_generator import generate_quiz_batch_from_docs, save_quiz
 
+# 데이터 디렉터리 절대 경로
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 def show_instructor_quiz():
     st.title("📝 퀴즈 생성기")
     st.markdown("선택한 교안 전체를 기반으로 객관식 퀴즈를 자동 생성합니다.")
@@ -23,7 +26,7 @@ def show_instructor_quiz():
     num_questions = st.slider("생성할 퀴즈 개수", min_value=1, max_value=20, value=5)
 
     # PDF 원본 경로
-    pdf_path = f"data/courses/{course_id}/raw/{course_id}.pdf"
+    pdf_path = os.path.join(BASE_DIR, "data", "courses", course_id, "raw", f"{course_id}.pdf")
     if not os.path.exists(pdf_path):
         st.error("❌ 교안 PDF 파일이 존재하지 않습니다. 업로드 후 다시 시도해주세요.")
         return

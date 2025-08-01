@@ -1,7 +1,9 @@
 import os
 import json
 
-COURSE_INDEX_PATH = "data/course_index.json"
+# 데이터 디렉터리 절대 경로
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+COURSE_INDEX_PATH = os.path.join(BASE_DIR, "data", "course_index.json")
 
 def ensure_index_file_exists():
     """파일이 없으면 빈 리스트로 생성"""

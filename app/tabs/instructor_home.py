@@ -5,7 +5,9 @@ import re
 import uuid
 from components.course_index_manager import add_course_to_index
 
-COURSE_INDEX_PATH = "data/course_index.json"
+# 데이터 디렉터리 절대 경로
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+COURSE_INDEX_PATH = os.path.join(BASE_DIR, "data", "course_index.json")
 
 
 # ✅ course_id 자동 생성 (slug + fallback uuid)

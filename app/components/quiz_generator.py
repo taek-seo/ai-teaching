@@ -7,6 +7,9 @@ from langchain_openai import ChatOpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
+# 데이터 디렉터리 절대 경로
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 def generate_mcq_from_text(text: str, num_choices: int = 4) -> dict:
     prompt = f"""
     다음 문단을 읽고, 문단 내용을 바탕으로 하나의 객관식 문제를 생성하세요.
@@ -83,7 +86,7 @@ def generate_quiz_batch_from_docs(docs: List[Document], num_questions: int = 5) 
     return quizzes
 
 def save_quiz(course_id: str, quiz_data: dict):
-    quiz_dir = f"data/courses/{course_id}/quiz"
+    quiz_dir = os.path.join(BASE_DIR, "data", "courses", course_id, "quiz")
     os.makedirs(quiz_dir, exist_ok=True)
 
     # 고유 파일명으로 저장
