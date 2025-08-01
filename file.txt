@@ -16,8 +16,8 @@ ai-teaching-assistant/
 │   │
 │   └── data/                      # JSON 및 벡터 저장소
 │       ├── course_index.json       # 과정 정보 저장 파일
-│       └── vectordb/               # 과정별 벡터 저장소 (FAISS)
-│           └── <course_id>/index.faiss
+│       └── courses/                # 과정별 벡터 저장소 (FAISS)
+│           └── <course_id>/index/index.faiss
 │
 ├── requirements.txt              # 의존성 목록
 └── venv/                         # Python 가상환경 (로컬용)
