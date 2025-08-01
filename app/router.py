@@ -4,6 +4,7 @@ from tabs.instructor_home import show_instructor_home
 from tabs.instructor_upload import show_instructor_upload
 from tabs.student_home import show_student_home
 from tabs.instructor_quiz import show_instructor_quiz
+from tabs.instructor_review import show_instructor_review
 
 def route_user():
     # 사용자 정보 출력
@@ -21,7 +22,7 @@ def route_user():
 
     # 역할 기반 탭 추가
     if st.session_state.role == "instructor":
-        tabs += ["📂 강사 홈", "📥 교안 업로드", "📝 퀴즈 생성"]
+        tabs += ["📂 강사 홈", "📥 교안 업로드", "📝 퀴즈 생성", "📄 복습 자료"]
     elif st.session_state.role == "student":
         tabs += ["📑 교육생 홈"]
 
@@ -36,5 +37,7 @@ def route_user():
         show_instructor_upload()
     elif selected == "📝 퀴즈 생성":
         show_instructor_quiz()
+    elif selected == "📄 복습 자료":
+        show_instructor_review()
     elif selected == "📑 교육생 홈":
         show_student_home()
