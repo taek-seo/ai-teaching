@@ -9,6 +9,9 @@ from langchain.chains import RetrievalQA
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 import pickle
 
+# 데이터 디렉터리 절대 경로
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 
 def embed_pdf_and_save(course_id: str, pdf_path: str):
     loader = PyMuPDFLoader(pdf_path)
@@ -21,7 +24,7 @@ def embed_pdf_and_save(course_id: str, pdf_path: str):
 
     vectordb = FAISS.from_documents(split_docs, embedding=embeddings)
 
-    save_dir = f"data/courses/{course_id}/index/"
+    save_dir = os.path.join(BASE_DIR, "data", "courses", course_id, "index")
     os.makedirs(save_dir, exist_ok=True)
     vectordb.save_local(save_dir)
 
@@ -31,7 +34,7 @@ def qa_from_course(course_id, question):
     """
     업로드된 교안 벡터를 바탕으로 질의응답 수행
     """
-    vector_path = f"data/courses/{course_id}/index"
+    vector_path = os.path.join(BASE_DIR, "data", "courses", course_id, "index")
 
     if not os.path.exists(vector_path):
         return "❌ 해당 과정의 벡터 데이터가 존재하지 않습니다.", []
