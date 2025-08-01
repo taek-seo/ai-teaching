@@ -92,12 +92,18 @@ def generate_report_from_pdf(pdf_path: str) -> str:
 
 
 def save_text_as_pdf(text: str, output_path: str) -> None:
-    """Save plain text as a simple PDF file."""
+    """텍스트를 한글 지원 PDF로 저장"""
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=12)
+
+    # ✅ 한글 지원 폰트 등록
+    font_path = os.path.join(BASE_DIR, "assets", "fonts", "NanumGothic-Regular.ttf")
+    pdf.add_font("Nanum", "", font_path, uni=True)
+    pdf.set_font("Nanum", size=12)
+
     for line in text.split("\n"):
         pdf.multi_cell(0, 10, txt=line)
+
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     pdf.output(output_path)
