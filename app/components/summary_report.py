@@ -183,6 +183,11 @@ def _wrap_text_line(line: str, char_width: int = 100) -> str:
     )
 
 def save_text_as_pdf(text: str, output_path: str) -> None:
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
     effective_w = pdf.w - pdf.l_margin - pdf.r_margin
 
     # 줄 간격(mm)
