@@ -22,11 +22,19 @@ def show_instructor_review():
         return
 
     if st.button("🚀 복습 자료 생성"):
-        with st.spinner("보고서 작성 중..."):
-            report_text = generate_report_from_pdf(pdf_path)
-            output_dir = os.path.join(BASE_DIR, "data", "courses", course_id)
-            output_file = os.path.join(output_dir, "review.pdf")
-            save_text_as_pdf(report_text, output_file)
+        progress_bar = st.progress(0.0)
+        status_area = st.empty()
+
+        def progress(step: int, total: int, message: str) -> None:
+            progress_bar.progress(step / total)
+            status_area.write(message)
+
+        report_text = generate_report_from_pdf(pdf_path, progress_callback=progress)
+        output_dir = os.path.join(BASE_DIR, "data", "courses", course_id)
+        output_file = os.path.join(output_dir, "review.pdf")
+        save_text_as_pdf(report_text, output_file)
+
+        status_area.write("완료")
         st.success("✅ 복습 자료가 생성되었습니다.")
         with open(output_file, "rb") as f:
             st.download_button("📥 PDF 다운로드", f, file_name=f"{course_id}_review.pdf")
