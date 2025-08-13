@@ -1,13 +1,17 @@
 import os
 import streamlit as st
-from components.summary_report import generate_report_from_pdf, save_text_as_pdf
+from components.summary_report import (
+    generate_report_from_pdf,
+    save_text_as_html,
+    convert_html_to_pdf,
+)
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 def show_instructor_review():
     st.title("📄 복습 자료 생성")
-    st.markdown("선택된 과정의 교안을 요약하여 강사용 PDF 자료를 생성합니다.")
+    st.markdown("선택된 과정의 교안을 요약하여 강사용 HTML 자료를 생성합니다.")
 
     course_id = st.session_state.get("course_id")
     course_name = st.session_state.get("course_name")
@@ -31,10 +35,14 @@ def show_instructor_review():
 
         report_text = generate_report_from_pdf(pdf_path, progress_callback=progress)
         output_dir = os.path.join(BASE_DIR, "data", "courses", course_id)
-        output_file = os.path.join(output_dir, "review.pdf")
-        save_text_as_pdf(report_text, output_file)
+        html_file = os.path.join(output_dir, "review.html")
+        pdf_file = os.path.join(output_dir, "review.pdf")
+        save_text_as_html(report_text, html_file)
+        convert_html_to_pdf(html_file, pdf_file)
 
         status_area.write("완료")
         st.success("✅ 복습 자료가 생성되었습니다.")
-        with open(output_file, "rb") as f:
+        with open(html_file, "rb") as f:
+            st.download_button("📥 HTML 다운로드", f, file_name=f"{course_id}_review.html")
+        with open(pdf_file, "rb") as f:
             st.download_button("📥 PDF 다운로드", f, file_name=f"{course_id}_review.pdf")

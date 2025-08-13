@@ -1,12 +1,11 @@
 import os
-import re
-import textwrap
 from typing import Callable, List, Optional
 
 from langchain_openai import ChatOpenAI
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from fpdf import FPDF
+from markdown import markdown
+import pdfkit
 
 # 프로젝트 루트(BASE_DIR): 이 파일(components/summary_report.py 등) 위치 기준 상위 디렉터리
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -151,8 +150,7 @@ def generate_report_from_pdf(
     review_prompt = (
         "아래 초안을 학술 보고서 형식의 한국어 문서로 다듬어 주세요."
         "\n- 각 섹션 제목은 '1. 제목' 형식을 유지하고 밑줄을 포함하세요."
-        "\n- 목록은 '-' 기호를 사용하고 표는 Markdown 표 형식을 유지하세요."
-        "\n- '#'나 '*' 문자를 사용하지 마세요.\n\n"
+        "\n- 목록은 '-' 기호를 사용하고 표는 Markdown 표 형식을 유지하세요.\n\n"
         f"{draft_report}"
     )
     final_report = llm.invoke(review_prompt).content
@@ -161,56 +159,24 @@ def generate_report_from_pdf(
 
 
 # ---------------------------
-# 텍스트 -> PDF 저장 파트
+# 텍스트 -> HTML 저장 파트
 # ---------------------------
-def _soft_wrap_long_tokens(s: str, limit: int = 80) -> str:
-    """
-    공백 없이 너무 긴 연속 토큰(예: URL, 해시)을 적당히 쪼개도록
-    소프트 공백을 삽입합니다. (FPDF 줄바꿈 보조)
-    """
-    return re.sub(r"(\S{" + str(limit) + r"})(?=\S)", r"\1 ", s)
-
-
-def _wrap_text_line(line: str, char_width: int = 100) -> str:
-    """
-    문자 기준 래핑. 긴 토큰도 강제로 쪼개도록 설정합니다.
-    """
-    return textwrap.fill(
-        line,
-        width=char_width,
-        break_long_words=True,
-        break_on_hyphens=False,
+def save_text_as_html(text: str, output_path: str) -> None:
+    """주어진 Markdown 텍스트를 HTML 파일로 변환하여 저장합니다."""
+    html_body = markdown(text)
+    html_content = (
+        "<!DOCTYPE html>\n"
+        "<html lang=\"ko\">\n<head>\n<meta charset=\"utf-8\">\n"
+        "</head>\n<body>\n"
+        f"{html_body}\n"
+        "</body>\n</html>"
     )
-
-def save_text_as_pdf(text: str, output_path: str) -> None:
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-
-    effective_w = pdf.w - pdf.l_margin - pdf.r_margin
-
-    # 줄 간격(mm)
-    line_h = 7
-
-    for raw_line in text.split("\n"):
-        line = raw_line.strip()
-
-        if not line:
-            # 공백 라인: 살짝 여백만
-            pdf.ln(line_h - 1)
-            continue
-
-        # 공백 없는 긴 토큰을 부드럽게 쪼갠 뒤 전체 래핑
-        line = _soft_wrap_long_tokens(line, limit=80)
-        wrapped = _wrap_text_line(line, char_width=100)
-
-        # 항상 왼쪽 마진부터 시작
-        pdf.set_x(pdf.l_margin)
-
-        # 남은 폭(0)이 아니라 유효폭을 명시적으로 지정
-        pdf.multi_cell(w=effective_w, h=line_h, txt=wrapped)
-
-    # 출력 경로 보장 후 저장
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    pdf.output(output_path)
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+
+def convert_html_to_pdf(html_path: str, pdf_path: str) -> None:
+    """HTML 파일을 PDF로 변환하여 저장합니다."""
+    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+    pdfkit.from_file(html_path, pdf_path)
